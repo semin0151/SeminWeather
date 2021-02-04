@@ -2,15 +2,13 @@ package com.example.MyWeather;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.widget.TextView;
 
 public class MainActivity extends AppCompatActivity {
     private TextView tv_weather;
 
-    private Handler mHandler;
     private String result;
 
     @Override
@@ -20,31 +18,20 @@ public class MainActivity extends AppCompatActivity {
 
         tv_weather = (TextView)findViewById(R.id.tv_weather);
 
-        mHandler = new Handler() {
-            @Override
-            public void handleMessage(Message msg) {
-                tv_weather.setText(result);
-            }
-        } ;
-
-        NewRunnable nr = new NewRunnable();
-        Thread t = new Thread(nr);
-        t.start();
-
+        NewAsyncTask task = new NewAsyncTask();
+        task.execute();
     }
 
-    class NewRunnable implements Runnable {
+    private class NewAsyncTask extends AsyncTask{
         @Override
-        public void run() {
+        protected void onPostExecute(Object o) {
+            tv_weather.setText(result);
+        }
 
-            try {
-                result = new WeatherString().getStr();
-            } catch (Exception e) {
-                e.printStackTrace() ;
-            }
-            mHandler.sendEmptyMessage(0) ;
+        @Override
+        protected Object doInBackground(Object[] objects) {
+            result = new WeatherString().getStr();
+            return null;
         }
     }
-
-
 }
